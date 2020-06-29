@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 using Logic.Interfaces;
-using Models.Models;
+using Models;
 using Models.ViewModels.Api;
 
 namespace Logic.Logic

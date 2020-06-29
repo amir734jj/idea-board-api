@@ -5,7 +5,7 @@ using Logic.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Models.Models;
+using Models;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace Api.Controllers.Api

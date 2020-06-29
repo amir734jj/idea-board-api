@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using Models.Models;
+using Models;
 using Models.ViewModels.Api;
 
 namespace Logic.Interfaces

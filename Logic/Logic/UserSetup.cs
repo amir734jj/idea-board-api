@@ -1,13 +1,10 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
-using Dal.Utilities;
+using Dal;
 using Logic.Interfaces;
-using Newtonsoft.Json;
 using Stream = Models.Models.Stream;
-using static Models.Constants.ApplicationConstants;
 
 namespace Logic.Logic
 {

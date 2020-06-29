@@ -1,4 +1,4 @@
-﻿using Models.Models;
+﻿using Models;
 
 namespace Logic.Interfaces
 {

@@ -1,0 +1,19 @@
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment Env
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Streaming Subscription</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+
+<div class="container-fluid" ng-app="streamSubscriptionApp" ng-cloak>
+    @RenderBody()
+</div>
+
+<mini-profiler position="RenderPosition.Right" />
+
+</body>
+</html>

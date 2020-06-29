@@ -5,8 +5,6 @@ using System.Text.RegularExpressions;
 using Logic.Extensions;
 using Logic.Interfaces;
 using Microsoft.Extensions.Logging;
-using NAudio.Wave;
-using NLayer.NAudioSupport;
 
 namespace Logic.Logic
 {
