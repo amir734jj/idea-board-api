@@ -7,6 +7,8 @@ using Dal.Interfaces;
 using Logic.Interfaces;
 using Microsoft.Extensions.Logging;
 using Models.ViewModels.Config;
+using static Models.Constants.GlobalConfigs;
+using static Models.Constants.ApplicationConstants;
 
 namespace Logic.Logic
 {

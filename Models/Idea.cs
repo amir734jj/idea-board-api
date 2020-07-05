@@ -5,7 +5,7 @@ using Models.Interfaces;
 
 namespace Models
 {
-    public class Idea : IEntityTimeStamped
+    public class Idea : IEntityTimeStamped, IEntityUserProp
     {
         public int Id { get; set; }
         

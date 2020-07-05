@@ -4,7 +4,7 @@ using Models.Interfaces;
 
 namespace Models
 {
-    public class Comment : IEntityTimeStamped
+    public class Comment : IEntityTimeStamped, IEntityUserProp
     {
         public int Id { get; set; }
         
