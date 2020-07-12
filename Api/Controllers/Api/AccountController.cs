@@ -60,6 +60,16 @@ namespace Api.Controllers.Api
         [SwaggerOperation("Register")]
         public async Task<IActionResult> Register([FromBody] RegisterViewModel registerViewModel)
         {
+            if (await _userManager.FindByEmailAsync(registerViewModel.Email) != null)
+            {
+                return BadRequest(new ErrorViewModel("Duplicate email. Please choose a different email"));
+            }
+            
+            if (await _userManager.FindByNameAsync(registerViewModel.Username) != null)
+            {
+                return BadRequest(new ErrorViewModel("Duplicate username. Please choose a different username"));
+            }
+
             var user = new User
             {
                 Name = registerViewModel.Name,
