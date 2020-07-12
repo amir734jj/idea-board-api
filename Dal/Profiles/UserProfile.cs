@@ -9,7 +9,9 @@ namespace Dal.Profiles
     {
         public User Update(User entity, User dto)
         {
-            throw new System.NotImplementedException();
+            entity.LastLoginTime = dto.LastLoginTime;
+
+            return entity;
         }
 
         public IQueryable<User> Include<TQueryable>(TQueryable queryable) where TQueryable : IQueryable<User>
