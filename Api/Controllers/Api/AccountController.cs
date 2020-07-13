@@ -22,8 +22,6 @@ namespace Api.Controllers.Api
     [Route("api/[controller]")]
     public class AccountController : Controller
     {
-        private const string SetupUserTempDataKey = nameof(SetupUserTempDataKey);
-
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signManager;
         private readonly JwtSettings _jwtSettings;
@@ -49,10 +47,15 @@ namespace Api.Controllers.Api
             {
                 var user = await _userManager.FindByEmailAsync(User.Identity.Name);
                 
-                return Ok(user);
+                return Ok(new
+                {
+                    email = user.Email,
+                    username = user.UserName,
+                    name = user.Name,
+                });
             }
 
-            return Ok(new { });
+            return BadRequest(new ErrorViewModel("User is not logged-in"));
         }
 
         [HttpPost]
@@ -128,6 +131,7 @@ namespace Api.Controllers.Api
                 token,
                 user.Name,
                 user.Email,
+                username = user.UserName,
                 expires
             });
         }

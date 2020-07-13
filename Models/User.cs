@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Identity;
 using Models.Interfaces;
@@ -9,6 +10,9 @@ namespace Models
     public class User : IdentityUser<int>, IEntity
     {
         public string Name { get; set; }
+        
+        [Column(TypeName="text")]
+        public string Description { get; set; }
         
         public List<Idea> Ideas { get; set; }
         

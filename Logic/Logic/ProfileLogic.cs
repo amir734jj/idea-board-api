@@ -14,12 +14,13 @@ namespace Logic.Logic
             _userLogic = userLogic;
         }
 
-        public async Task Update(User user, ProfileViewModel profileViewModel)
+        public async Task<ProfileViewModel> Update(User user, ProfileViewModel profileViewModel)
         {
-            await _userLogic.Update(user.Id, entity =>
+            return new ProfileViewModel(await _userLogic.Update(user.Id, entity =>
             {
                 entity.Name = profileViewModel.Name;
-            });
+                entity.Description = profileViewModel.Description;
+            }));
         }
     }
 }
