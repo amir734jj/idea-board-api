@@ -2,6 +2,7 @@ using System.Linq;
 using EfCoreRepository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Models;
+using Models.Relationships;
 
 namespace Dal.Profiles
 {
@@ -16,6 +17,7 @@ namespace Dal.Profiles
         
         public Idea Update(Idea entity, Idea dto)
         {
+            entity.Tag = dto.Tag;
             entity.Title = dto.Title;
             entity.Description = dto.Description;
             entity.CreatedOn = dto.CreatedOn;
@@ -29,6 +31,7 @@ namespace Dal.Profiles
         public IQueryable<Idea> Include<TQueryable>(TQueryable queryable) where TQueryable : IQueryable<Idea>
         {
             return queryable
+                .Include(x => x.Votes)
                 .Include(x => x.IdeaCategoryRelationships)
                 .ThenInclude(x => x.Category)
                 .Include(x => x.IdeaCategoryRelationships)
