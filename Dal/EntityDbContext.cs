@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 using Models;
+using Models.Relationships;
 using static Dal.Utilities.ConnectionStringUtility;
 
 namespace Dal
@@ -24,6 +25,14 @@ namespace Dal
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Idea>()
+                .HasMany(x => x.Votes)
+                .WithOne(x => x.Idea);
+
+            modelBuilder.Entity<UserVote>()
+                .HasOne(x => x.User)
+                .WithMany(x => x.Votes);
 
             modelBuilder.Entity<User>()
                 .HasMany(x => x.Comments)

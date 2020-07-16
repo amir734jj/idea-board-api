@@ -1,6 +1,6 @@
 using Models.Interfaces;
 
-namespace Models
+namespace Models.Relationships
 {
     public class IdeaCategoryRelationship : IEntity
     {

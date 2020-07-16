@@ -19,6 +19,7 @@ namespace Models
         public List<Comment> Comments { get; set; }
         
         public DateTimeOffset LastLoginTime { get; set; }
+        public List<UserVote> Votes { get; set; }
 
         public object Obfuscate()
         {

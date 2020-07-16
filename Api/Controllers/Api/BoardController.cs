@@ -2,6 +2,8 @@ using System.Threading.Tasks;
 using Logic.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Models;
 using Models.Enums;
 
 namespace Api.Controllers.Api
@@ -11,29 +13,34 @@ namespace Api.Controllers.Api
     public class BoardController : Controller
     {
         private readonly IBoardLogic _boardLogic;
+        
+        private readonly UserManager<User> _userManager;
 
-        public BoardController(IBoardLogic boardLogic)
+        public BoardController(IBoardLogic boardLogic, UserManager<User> userManager)
         {
             _boardLogic = boardLogic;
+            _userManager = userManager;
         }
 
-        [Route("")]
+        [Route("{page?}")]
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index([FromRoute] int page = 0, [FromQuery] Sort sort = Sort.Vote, [FromQuery] Order order = Order.Descending)
         {
-            var ideas = await _boardLogic.Top();
+            var ideas = await _boardLogic.Collect(page, sort, order);
 
             return Ok(ideas);
         }
         
         [Authorize]
-        [Route("{id}/{vote}")]
+        [Route("vote/{id}/{vote}")]
         [HttpGet]
         public async Task<IActionResult> Vote([FromRoute] int id, [FromRoute] Vote vote)
         {
-            var result = await _boardLogic.Vote(id, vote);
+            var user = await _userManager.FindByEmailAsync(User.Identity.Name);
+            
+            await _boardLogic.Vote(id, user.Id, vote);
 
-            return Ok(result);
+            return Ok("Updated the vote");
         }
     }
 }

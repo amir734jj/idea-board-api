@@ -7,8 +7,8 @@ namespace Logic.Interfaces
 {
     public interface IBoardLogic
     {
-        Task<List<Idea>> Top();
+        Task<List<Idea>> Collect(int page, Sort sort, Order order);
 
-        Task<bool> Vote(int id, Vote vote);
+        Task Vote(int ideaId, int userId, Vote vote);
     }
 }

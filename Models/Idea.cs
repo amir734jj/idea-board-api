@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using Models.Enums;
 using Models.Interfaces;
+using Models.Relationships;
 
 namespace Models
 {
@@ -15,7 +17,7 @@ namespace Models
         [Column(TypeName="text")]
         public string Description { get; set; }
         
-        public int Votes { get; set; }
+        public List<UserVote> Votes { get; set; }
         
         public List<IdeaCategoryRelationship> IdeaCategoryRelationships { get; set; }
         
@@ -23,5 +25,7 @@ namespace Models
         
         public List<Comment> Comments { get; set; }
         public User User { get; set; }
+        
+        public Tag Tag { get; set; }
     }
 }
