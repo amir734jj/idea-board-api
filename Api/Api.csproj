@@ -9,6 +9,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.0.1" />
         <PackageReference Include="MlkPwgen" Version="0.3.0" />
         <PackageReference Include="Lamar.Microsoft.DependencyInjection" Version="4.3.0" />
         <PackageReference Include="Flurl" Version="2.8.2" />

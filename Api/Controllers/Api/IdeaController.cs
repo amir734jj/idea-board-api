@@ -1,10 +1,13 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Logic.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Api.Abstracts;
+using Models.ViewModels.Api;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Api.Controllers.Api
 {
