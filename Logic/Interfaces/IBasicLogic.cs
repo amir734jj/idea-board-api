@@ -16,7 +16,5 @@ namespace Logic.Interfaces
         Task<T> Delete(int id);
 
         Task<T> Update(int id, T dto);
-
-        Task<T> Update(int id, Action<T> updater);
     }
 }

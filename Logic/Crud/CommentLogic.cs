@@ -1,30 +1,30 @@
 ﻿using EfCoreRepository.Interfaces;
 using Logic.Abstracts;
 using Logic.Interfaces;
-using Models;
+using Models.Entities;
 
 namespace Logic.Crud
 {
-    public class IdeaLogic : BasicLogicUserBoundAbstract<Idea>, IIdeaLogic
+    public class CommentLogic : BasicLogicAbstract<Comment>, ICommentLogic
     {
-        private readonly IBasicCrudType<Idea, int> _userDal;
+        private readonly IBasicCrudWrapper<Comment> _commentLogic;
 
         /// <summary>
         /// Constructor dependency injection
         /// </summary>
         /// <param name="repository"></param>
-        public IdeaLogic(IEfRepository repository)
+        public CommentLogic(IEfRepository repository)
         {
-            _userDal = repository.For<Idea, int>();
+            _commentLogic = repository.For<Comment>();
         }
 
         /// <summary>
         /// Returns DAL
         /// </summary>
         /// <returns></returns>
-        protected override IBasicCrudType<Idea, int> GetBasicCrudDal()
+        protected override IBasicCrudWrapper<Comment> GetBasicCrudDal()
         {
-            return _userDal;
+            return _commentLogic;
         }
     }
 }

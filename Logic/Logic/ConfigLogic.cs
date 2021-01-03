@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Immutable;
 using System.Net;
 using System.Threading.Tasks;
@@ -6,27 +5,35 @@ using Dal.Extensions;
 using Dal.Interfaces;
 using Logic.Interfaces;
 using Microsoft.Extensions.Logging;
+using Models.Constants;
 using Models.ViewModels.Config;
-using static Models.Constants.GlobalConfigs;
 using static Models.Constants.ApplicationConstants;
 
 namespace Logic.Logic
 {
     public class ConfigLogic : IConfigLogic
     {
+        private readonly GlobalConfigs _globalConfigs;
+        
         private readonly IS3Service _s3Service;
 
         private readonly ILogger<ConfigLogic> _logger;
 
-        public ConfigLogic(IS3Service s3Service, ILogger<ConfigLogic> logger)
+        public ConfigLogic(GlobalConfigs globalConfigs, IS3Service s3Service, ILogger<ConfigLogic> logger)
         {
+            _globalConfigs = globalConfigs;
             _s3Service = s3Service;
             _logger = logger;
         }
 
-        private async Task SetGlobalConfig(GlobalConfigViewModel globalConfigViewModel)
+        public GlobalConfigViewModel ResolveGlobalConfig()
         {
-            UpdateGlobalConfigs(globalConfigViewModel);
+            return _globalConfigs;
+        }
+
+        public async Task UpdateGlobalConfig(GlobalConfigViewModel globalConfigViewModel)
+        {
+            _globalConfigs.Update(globalConfigViewModel);
 
             var response = await _s3Service.Upload(ConfigFile, globalConfigViewModel.ObjectToByteArray(),
                 ImmutableDictionary.Create<string, string>().Add("Description", "Application config file"));
@@ -37,18 +44,6 @@ namespace Logic.Logic
             }
         }
 
-        public GlobalConfigViewModel ResolveGlobalConfig()
-        {
-            return ToViewModel();
-        }
-
-        public async Task UpdateGlobalConfig(Func<GlobalConfigViewModel, GlobalConfigViewModel> update)
-        {
-            var re = update(ResolveGlobalConfig());
-            
-            await SetGlobalConfig(re);
-        }
-
         public async Task Refresh()
         {
             var response = await _s3Service.Download(ConfigFile);
@@ -57,7 +52,9 @@ namespace Logic.Logic
             {
                 _logger.LogInformation("Successfully fetched the config from S3");
 
-                UpdateGlobalConfigs(response.Data.Deserialize<GlobalConfigViewModel>());
+                var globalConfigViewModel = response.Data.Deserialize<GlobalConfigViewModel>();
+                
+                _globalConfigs.Update(globalConfigViewModel);
             }
             else
             {

@@ -7,13 +7,13 @@ using Models.Interfaces;
 
 namespace Logic.Abstracts
 {
-    public abstract class BasicLogicAbstract<T> : IBasicLogic<T> where T: class, IEntity
+    public abstract class BasicLogicAbstract<T> : IBasicLogic<T> where T : class, IEntity
     {
         /// <summary>
         /// Returns instance of basic DAL
         /// </summary>
         /// <returns></returns>
-        protected abstract IBasicCrudType<T, int> GetBasicCrudDal();
+        protected abstract IBasicCrudWrapper<T> GetBasicCrudDal();
 
         /// <summary>
         /// Call forwarding
@@ -63,17 +63,6 @@ namespace Logic.Abstracts
         public virtual Task<T> Update(int id, T dto)
         {
             return GetBasicCrudDal().Update(id, dto);
-        }
-
-        public async Task<T> Update(int id, Action<T> updater)
-        {
-            await using var session = GetBasicCrudDal().Session();
-            
-            var entity = await session.Get(id);
-
-            updater(entity);
-
-            return await session.Update(id, entity);
         }
     }
 }

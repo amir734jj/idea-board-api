@@ -3,8 +3,9 @@ using Logic.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Models;
+using Models.Entities;
 using Models.Enums;
+using Models.ViewModels.Api;
 
 namespace Api.Controllers.Api
 {
@@ -13,7 +14,6 @@ namespace Api.Controllers.Api
     public class BoardController : Controller
     {
         private readonly IBoardLogic _boardLogic;
-        
         private readonly UserManager<User> _userManager;
 
         public BoardController(IBoardLogic boardLogic, UserManager<User> userManager)
@@ -24,23 +24,62 @@ namespace Api.Controllers.Api
 
         [Route("{page?}")]
         [HttpGet]
-        public async Task<IActionResult> Index([FromRoute] int page = 0, [FromQuery] Sort sort = Sort.Vote, [FromQuery] Order order = Order.Descending)
+        public async Task<IActionResult> Index([FromRoute] int index = 0, [FromQuery] Sort sort = Sort.Vote,
+            [FromQuery] Order order = Order.Descending, [FromQuery] int pageSize = 10,
+            [FromQuery] string category = "", [FromQuery] string keyword = "")
         {
-            var ideas = await _boardLogic.Collect(page, sort, order);
+            var board = await _boardLogic.Collect(index, sort, order, pageSize, category, keyword);
 
-            return Ok(ideas);
+            return Ok(board);
         }
-        
+
         [Authorize]
         [Route("vote/{id}/{vote}")]
-        [HttpGet]
+        [HttpPost]
         public async Task<IActionResult> Vote([FromRoute] int id, [FromRoute] Vote vote)
         {
-            var user = await _userManager.FindByEmailAsync(User.Identity.Name);
-            
-            await _boardLogic.Vote(id, user.Id, vote);
+            var user = await _userManager.FindByNameAsync(User.Identity.Name);
 
-            return Ok("Updated the vote");
+            var project = await _boardLogic.Vote(id, user, vote);
+
+            return Ok(project);
+        }
+
+        [Authorize]
+        [Route("comment/{id}")]
+        [HttpPost]
+        public async Task<IActionResult> AddComment([FromRoute] int id, [FromBody] CommentViewModel comment)
+        {
+            var user = await _userManager.FindByNameAsync(User.Identity.Name);
+
+            var project = await _boardLogic.AddComment(id, user, comment);
+
+            return Ok(project);
+        }
+
+        [Authorize]
+        [Route("comment/{id}/{commentId}")]
+        [HttpPut]
+        public async Task<IActionResult> EditComment([FromRoute] int id, [FromRoute]int commentId,
+            [FromBody] CommentViewModel comment)
+        {
+            var user = await _userManager.FindByNameAsync(User.Identity.Name);
+
+            var project = await _boardLogic.EditComment(id, user, commentId, comment);
+
+            return Ok(project);
+        }
+
+        [Authorize]
+        [Route("comment/{id}/{commentId}")]
+        [HttpDelete]
+        public async Task<IActionResult> DeleteComment([FromRoute] int id, [FromRoute] int commentId)
+        {
+            var user = await _userManager.FindByNameAsync(User.Identity.Name);
+
+            var project = await _boardLogic.DeleteComment(id, user, commentId);
+
+            return Ok(project);
         }
     }
 }

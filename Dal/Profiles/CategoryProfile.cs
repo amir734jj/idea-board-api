@@ -1,21 +1,30 @@
 using System.Linq;
 using EfCoreRepository.Interfaces;
-using Models;
+using Microsoft.EntityFrameworkCore;
+using Models.Entities;
 
 namespace Dal.Profiles
 {
-    public class CategoryProfile : IEntityProfile<Category, int>
+    public class CategoryProfile : IEntityProfile<Category>
     {
-        public Category Update(Category entity, Category dto)
+        private readonly IEntityProfileAuxiliary _entityProfileAuxiliary;
+
+        public CategoryProfile(IEntityProfileAuxiliary entityProfileAuxiliary)
+        {
+            _entityProfileAuxiliary = entityProfileAuxiliary;
+        }
+
+        public void Update(Category entity, Category dto)
         {
             entity.Name = dto.Name;
-
-            return entity;
+            entity.ProjectCategoryRelationships =  _entityProfileAuxiliary.ModifyList(entity.ProjectCategoryRelationships, dto.ProjectCategoryRelationships, x => new { x.CategoryId, x.ProjectId});
         }
 
         public IQueryable<Category> Include<TQueryable>(TQueryable queryable) where TQueryable : IQueryable<Category>
         {
-            return queryable;
+            return queryable
+                .Include(x => x.ProjectCategoryRelationships)
+                .ThenInclude(x => x.Project);
         }
     }
 }

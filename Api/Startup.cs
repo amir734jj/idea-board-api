@@ -12,8 +12,8 @@ using Dal;
 using Dal.Configs;
 using Dal.Interfaces;
 using Dal.ServiceApi;
-using EFCache;
 using EfCoreRepository.Extensions;
+using EFCoreSecondLevelCacheInterceptor;
 using Lamar;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -31,11 +31,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using MlkPwgen;
-using Models;
 using Models.Constants;
+using Models.Entities;
+using Models.Utilities;
 using Newtonsoft.Json;
-using StackExchange.Redis;
 using static Dal.Utilities.ConnectionStringUtility;
 
 namespace Api
@@ -133,14 +132,12 @@ namespace Api
                     c.IncludeXmlComments(xmlPath);
                 }
 
-                c.AddSecurityDefinition("Bearer", // Name the security scheme
+                c.AddSecurityDefinition("Bearer",
                     new OpenApiSecurityScheme
                     {
                         Description = "JWT Authorization header using the Bearer scheme.",
-                        Type = SecuritySchemeType
-                            .Http, // We set the scheme type to http since we're using bearer authentication
-                        Scheme =
-                            "bearer" // The name of the HTTP Authorization scheme to be used in the Authorization header. In this case "bearer".
+                        Type = SecuritySchemeType.Http,
+                        Scheme = "bearer"
                     });
             });
 
@@ -188,33 +185,47 @@ namespace Api
             // L2 EF cache
             if (_env.IsDevelopment())
             {
-                EntityFrameworkCache.Initialize(new InMemoryCache());
+                services.AddEFSecondLevelCache(options =>
+                    options.UseEasyCachingCoreProvider("memory").DisableLogging(true)
+                );
+
+                services.AddEasyCaching(options => options.UseInMemory("memory"));
             }
             else
             {
-                var redisConnectionString =
-                    ConnectionStringUrlToRedisResource(_configuration.GetValue<string>("REDISTOGO_URL"));
+                services.AddEFSecondLevelCache(options =>
+                    options.UseEasyCachingCoreProvider("redis").DisableLogging(true));
 
-                var redisConfigurationOptions = ConfigurationOptions.Parse(redisConnectionString);
+                services.AddEasyCaching(options =>
+                {
+                    var (_, dictionary) = UrlUtility.UrlToResource(_configuration.GetValue<string>("REDISTOGO_URL"));
 
-                // Important
-                redisConfigurationOptions.AbortOnConnectFail = false;
-
-                EntityFrameworkCache.Initialize(new EFCache.Redis.RedisCache(redisConfigurationOptions));
+                    // use memory cache with your own configuration
+                    options.UseRedis(x =>
+                    {
+                        x.DBConfig.Endpoints.Add(
+                            new EasyCaching.Core.Configurations.ServerEndPoint(dictionary["Host"],
+                                int.Parse(dictionary["Port"])));
+                        x.DBConfig.Username = dictionary["Username"];
+                        x.DBConfig.Password = dictionary["Password"];
+                        x.DBConfig.AbortOnConnectFail = false;
+                    });
+                });
             }
 
             services.AddEfRepository<EntityDbContext>(x =>
             {
                 x.Profiles(Assembly.Load("Dal"), Assembly.Load("Models"));
             });
-
+            
             var jwtSetting = _configuration
                 .GetSection("JwtSettings")
                 .Get<JwtSettings>();
 
             if (_env.IsDevelopment() && string.IsNullOrEmpty(jwtSetting.Key))
             {
-                jwtSetting.Key = PasswordGenerator.Generate(length: 100, allowed: Sets.Alphanumerics);
+                jwtSetting.Key =
+                    "DCk2T4guOWvu8WRklEEmKazH5gqUJQnyCYXfzFJQU84tY0iJFeUJc2yIQqkqJ4od8AQvyXdlOFP0Q0QGWzB84W4hWFptL8APynvt";
 
                 IdentityModelEventSource.ShowPII = true;
             }

@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Models.ViewModels.Identities
 {
     /// <summary>
@@ -5,12 +7,26 @@ namespace Models.ViewModels.Identities
     /// </summary>
     public class RegisterViewModel
     {
-        public string Name { get; set; }
+        [Required] public string Name { get; set; }
 
-        public string Username { get; set; }
-        
+        [Required] [MinLength(6)] public string Username { get; set; }
+
+        [Required]
+        [RegularExpression("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$",
+            ErrorMessage = "Password should contain lower and upper case alphanumeric characters + special character")]
         public string Password { get; set; }
         
-        public string Email { get; set; }
+        [Required]
+        [RegularExpression("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$",
+            ErrorMessage = "Password should contain lower and upper case alphanumeric characters + special character")]
+        public string PasswordConfirmation { get; set; }
+
+        [Required]
+        [Display(Name = "Confirm Password")]
+        [RegularExpression("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$",
+            ErrorMessage = "Password should contain lower and upper case alphanumeric characters + special character")]
+        public string ConfirmPassword { get; set; }
+
+        [Required] [EmailAddress] public string Email { get; set; }
     }
 }

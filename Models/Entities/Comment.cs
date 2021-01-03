@@ -2,7 +2,7 @@ using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using Models.Interfaces;
 
-namespace Models
+namespace Models.Entities
 {
     public class Comment : IEntityTimeStamped, IEntityUserProp
     {
@@ -13,7 +13,7 @@ namespace Models
         
         public User User { get; set; }
         
-        public Idea Idea { get; set; }
+        public Project Project { get; set; }
         
         public DateTimeOffset CreatedOn { get; set; }
     }

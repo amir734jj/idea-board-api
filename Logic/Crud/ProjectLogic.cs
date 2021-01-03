@@ -1,30 +1,30 @@
 ﻿using EfCoreRepository.Interfaces;
 using Logic.Abstracts;
 using Logic.Interfaces;
-using Models;
+using Models.Entities;
 
 namespace Logic.Crud
 {
-    public class CategoryLogic : BasicLogicAbstract<Category>, ICategoryLogic
+    public class ProjectLogic : BasicLogicUserBoundAbstract<Project>, IProjectLogic
     {
-        private readonly IBasicCrudType<Category, int> _categoryDal;
+        private readonly IBasicCrudWrapper<Project> _userDal;
 
         /// <summary>
         /// Constructor dependency injection
         /// </summary>
         /// <param name="repository"></param>
-        public CategoryLogic(IEfRepository repository)
+        public ProjectLogic(IEfRepository repository)
         {
-            _categoryDal = repository.For<Category, int>();
+            _userDal = repository.For<Project>();
         }
 
         /// <summary>
         /// Returns DAL
         /// </summary>
         /// <returns></returns>
-        protected override IBasicCrudType<Category, int> GetBasicCrudDal()
+        protected override IBasicCrudWrapper<Project> GetBasicCrudDal()
         {
-            return _categoryDal;
+            return _userDal;
         }
     }
 }

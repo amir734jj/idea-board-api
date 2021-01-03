@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 using Logic.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Models;
 using Api.Abstracts;
+using Models.Entities;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace Api.Controllers.Api
@@ -24,6 +24,7 @@ namespace Api.Controllers.Api
             _categoryLogic = categoryLogic;
         }
 
+        [NonAction]
         protected override async Task<IBasicLogic<Category>> BasicLogic()
         {
             return _categoryLogic;

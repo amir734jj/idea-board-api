@@ -1,7 +1,7 @@
 using Models.Enums;
 using Models.Interfaces;
 
-namespace Models
+namespace Models.Entities
 {
     public class UserVote : IEntity
     {
@@ -9,9 +9,9 @@ namespace Models
         
         public Vote Value { get; set; }
         
-        public Idea Idea { get; set; }
+        public Project Project { get; set; }
         
-        public int IdeaId { get; set; }
+        public int ProjectId { get; set; }
         
         public User User { get; set; }
         

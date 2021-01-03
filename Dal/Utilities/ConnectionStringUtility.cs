@@ -22,7 +22,7 @@ namespace Dal.Utilities
 
             return configurationOptions.ToString();
         }
-        
+
         
         /// <summary>
         /// Converts connection string url to resource
@@ -49,7 +49,8 @@ namespace Dal.Utilities
                 TrustServerCertificate = true,
                 Pooling = true,
                 // Hard limit
-                MaxPoolSize = 5
+                MaxPoolSize = 5,
+                Port = int.Parse(table["Port"])
             };
 
             return connectionStringBuilder.ToString();

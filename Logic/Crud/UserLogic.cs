@@ -1,13 +1,13 @@
 ﻿using EfCoreRepository.Interfaces;
 using Logic.Abstracts;
 using Logic.Interfaces;
-using Models;
+using Models.Entities;
 
 namespace Logic.Crud
 {
     public class UserLogic : BasicLogicAbstract<User>, IUserLogic
     {
-        private readonly IBasicCrudType<User, int> _userDal;
+        private readonly IBasicCrudWrapper<User> _userDal;
 
         /// <summary>
         /// Constructor dependency injection
@@ -15,14 +15,14 @@ namespace Logic.Crud
         /// <param name="repository"></param>
         public UserLogic(IEfRepository repository)
         {
-            _userDal = repository.For<User, int>();
+            _userDal = repository.For<User>();
         }
 
         /// <summary>
         /// Returns DAL
         /// </summary>
         /// <returns></returns>
-        protected override IBasicCrudType<User, int> GetBasicCrudDal()
+        protected override IBasicCrudWrapper<User> GetBasicCrudDal()
         {
             return _userDal;
         }

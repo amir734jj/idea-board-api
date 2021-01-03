@@ -1,15 +1,16 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
-using Models;
+using Models.Entities;
 using Models.Relationships;
 using static Dal.Utilities.ConnectionStringUtility;
 
 namespace Dal
 {
-    public sealed class EntityDbContext : IdentityDbContext<User, IdentityRole<int>, int>, IDesignTimeDbContextFactory<EntityDbContext>
+    public sealed class EntityDbContext : IdentityDbContext<User, IdentityRole<int>, int>,
+        IDesignTimeDbContextFactory<EntityDbContext>
     {
         /// <inheritdoc />
         /// <summary>
@@ -26,40 +27,55 @@ namespace Dal
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Idea>()
-                .HasMany(x => x.Votes)
-                .WithOne(x => x.Idea);
+            modelBuilder.Entity<Category>()
+                .HasIndex(x => x.Name)
+                .IsUnique();
 
             modelBuilder.Entity<UserVote>()
                 .HasOne(x => x.User)
-                .WithMany(x => x.Votes);
+                .WithMany(x => x.Votes)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<User>()
                 .HasMany(x => x.Comments)
                 .WithOne(x => x.User)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<Project>()
+                .HasMany(x => x.Comments)
+                .WithOne(x => x.Project)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Comment>()
+                .HasOne(x => x.Project)
+                .WithMany(x => x.Comments);
+
             modelBuilder.Entity<User>()
-                .HasMany(x => x.Ideas)
+                .HasMany(x => x.Projects)
                 .WithOne(x => x.User)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Idea>()
+            modelBuilder.Entity<Project>()
                 .HasMany(x => x.Comments)
-                .WithOne(x => x.Idea);
+                .WithOne(x => x.Project);
             
-            modelBuilder.Entity<IdeaCategoryRelationship>()
-                .HasKey(x => new {x.IdeaId, x.CategoryId});
+            modelBuilder.Entity<ProjectCategoryRelationship>()
+                .HasKey(x => new {x.ProjectId, x.CategoryId});
 
-            modelBuilder.Entity<IdeaCategoryRelationship>()
-                .HasOne(x => x.Idea)
-                .WithMany(x => x.IdeaCategoryRelationships)
-                .HasForeignKey(x => x.CategoryId);
+            modelBuilder.Entity<ProjectCategoryRelationship>()
+                .HasOne(x => x.Project)
+                .WithMany(x => x.ProjectCategoryRelationships)
+                .HasForeignKey(x => x.ProjectId);
             
-            modelBuilder.Entity<IdeaCategoryRelationship>()
+            modelBuilder.Entity<ProjectCategoryRelationship>()
                 .HasOne(x => x.Category)
-                .WithMany(x => x.IdeaCategoryRelationships)
+                .WithMany(x => x.ProjectCategoryRelationships)
                 .HasForeignKey(x => x.CategoryId);
+            
+            modelBuilder.Entity<User>()
+                .HasMany(x => x.UserNotifications)
+                .WithOne(x => x.User)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -69,6 +85,7 @@ namespace Dal
             base.OnConfiguring(optionsBuilder);
         }
 
+        
         /// <summary>
         ///     This is used for DB migration locally
         /// </summary>

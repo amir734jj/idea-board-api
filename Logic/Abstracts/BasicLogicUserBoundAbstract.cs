@@ -1,9 +1,8 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using EfCoreRepository.Interfaces;
 using Logic.Interfaces;
-using Models;
+using Models.Entities;
 using Models.Interfaces;
 
 namespace Logic.Abstracts
@@ -20,9 +19,9 @@ namespace Logic.Abstracts
     {
         private readonly User _user;
         
-        private readonly IBasicCrudType<T, int> _basicCrudDal;
+        private readonly IBasicCrudWrapper<T> _basicCrudDal;
 
-        public BasicLogicUserBoundImpl(User user, IBasicCrudType<T, int> basicCrudDal)
+        public BasicLogicUserBoundImpl(User user, IBasicCrudWrapper<T> basicCrudDal)
         {
             _user = user;
             _basicCrudDal = basicCrudDal;
@@ -32,29 +31,34 @@ namespace Logic.Abstracts
         {
             instance.User = _user;
 
-            return base.Save(instance);
+            return GetBasicCrudDal().Save(instance);
         }
 
-        protected override IBasicCrudType<T, int> GetBasicCrudDal()
+        protected override IBasicCrudWrapper<T> GetBasicCrudDal()
         {
             return _basicCrudDal;
         }
 
-        public override async Task<IEnumerable<T>> GetAll()
+        public override Task<T> Get(int id)
         {
-            return (await _basicCrudDal.GetAll()).Where(x => x.User.Id == _user.Id).ToList();
+            return GetBasicCrudDal().Get(x => x.User.Id == _user.Id && x.Id == id);
         }
 
-        public override async Task<T> Get(int id)
-        {
-            return (await _basicCrudDal.GetAll()).Where(x => x.User.Id == _user.Id).FirstOrDefault(x => x.Id == id);
-        }
-
-        public override async Task<T> Update(int id, T dto)
+        public override Task<T> Update(int id, T dto)
         {
             dto.User = _user;
-            
-            return await base.Update(id, dto);
+
+            return GetBasicCrudDal().Update(x => x.User.Id == _user.Id && x.Id == id, dto);
+        }
+
+        public override Task<IEnumerable<T>> GetAll()
+        {
+            return GetBasicCrudDal().GetAll(x => x.User.Id == _user.Id);
+        }
+
+        public override Task<T> Delete(int id)
+        {
+            return GetBasicCrudDal().Delete(x => x.User.Id == _user.Id && x.Id == id);
         }
     }
 }

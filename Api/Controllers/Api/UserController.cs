@@ -1,16 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Logic.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Models;
+using Models.Entities;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace Api.Controllers.Api
 {
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [Route("api/[controller]")]
     public class UserController : Controller
     {
@@ -32,10 +31,9 @@ namespace Api.Controllers.Api
         [HttpGet]
         [Route("")]
         [SwaggerOperation("GetAll")]
-        [ProducesResponseType(typeof(IEnumerable<>), 200)]
         public async Task<IActionResult> GetAll()
         {
-            var user = await _userManager.FindByEmailAsync(User.Identity.Name);
+            var user = await _userManager.FindByNameAsync(User.Identity.Name);
 
             var users = (await _userLogic.GetAll()).Select(x => x.Id == user.Id ? x.ToAnonymousObject() : x.Obfuscate());
 

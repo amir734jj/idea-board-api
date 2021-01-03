@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Api.Configs;
+using Logic.Extensions;
 using Logic.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +14,7 @@ using Microsoft.IdentityModel.Tokens;
 using Models.ViewModels.Identities;
 using Swashbuckle.AspNetCore.Annotations;
 using Microsoft.AspNetCore.Authorization;
-using Models;
+using Models.Entities;
 using Models.ViewModels.Api;
 
 namespace Api.Controllers.Api
@@ -47,15 +48,10 @@ namespace Api.Controllers.Api
             {
                 var user = await _userManager.FindByEmailAsync(User.Identity.Name);
                 
-                return Ok(new
-                {
-                    email = user.Email,
-                    username = user.UserName,
-                    name = user.Name,
-                });
+                return Ok(user);
             }
 
-            return BadRequest(new ErrorViewModel("User is not logged-in"));
+            return Ok(new { });
         }
 
         [HttpPost]
@@ -63,16 +59,23 @@ namespace Api.Controllers.Api
         [SwaggerOperation("Register")]
         public async Task<IActionResult> Register([FromBody] RegisterViewModel registerViewModel)
         {
-            if (await _userManager.FindByEmailAsync(registerViewModel.Email) != null)
-            {
-                return BadRequest(new ErrorViewModel("Duplicate email. Please choose a different email"));
-            }
+            var users = (await _userLogic.GetAll()).ToList();
             
-            if (await _userManager.FindByNameAsync(registerViewModel.Username) != null)
+            if (registerViewModel.Password != registerViewModel.PasswordConfirmation)
             {
-                return BadRequest(new ErrorViewModel("Duplicate username. Please choose a different username"));
+                return BadRequest(new ErrorViewModel("Password and Password Confirmation do not match"));
             }
 
+            if (users.Any(x => x.UserName.Equals(registerViewModel.Username, StringComparison.OrdinalIgnoreCase)))
+            {
+                return BadRequest(new ErrorViewModel("Username is already taken. Please try another username"));
+            }
+            
+            if (users.Any(x => x.Email.Equals(registerViewModel.Email, StringComparison.OrdinalIgnoreCase)))
+            {
+                return BadRequest(new ErrorViewModel("There is an existing user with this email. Please try another email"));
+            }
+            
             var user = new User
             {
                 Name = registerViewModel.Name,
@@ -131,7 +134,6 @@ namespace Api.Controllers.Api
                 token,
                 user.Name,
                 user.Email,
-                username = user.UserName,
                 expires
             });
         }
@@ -177,7 +179,7 @@ namespace Api.Controllers.Api
             var claims = new[]
             {
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Name, user.Email),    // use email as name
+                new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Sub, user.Email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
