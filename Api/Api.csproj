@@ -19,7 +19,7 @@
         <PackageReference Include="Markdig" Version="0.22.1" />
         <PackageReference Include="MlkPwgen" Version="0.3.0" />
         <PackageReference Include="Lamar.Microsoft.DependencyInjection" Version="4.3.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.6" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.18" />
         <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="3.1.4" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.6" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.Extensions" Version="3.1.6" />
